@@ -31,7 +31,7 @@ function addCityToDOM(id, city, description, image) {
   let div = document.createElement("div");
   div.className = "col-12 col-sm-6 col-md-3 mb-5";
   div.innerHTML = ` 
-          <a href="pages/adventures/?city=${id}" id="${id}">
+          <a href="./pages/adventures/?city=${id}" id="${id}">
             <div class="tile" id="${id}">
               <div class="tile-text text-center">
                 <h5>${city}</h5>
