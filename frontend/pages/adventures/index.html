@@ -197,6 +197,7 @@
             filters["category"] = [];
             let filteredAdventures = filterFunction(adventures, filters);
             addAdventureToDOM(filteredAdventures);
+            saveFiltersToLocalStorage(filters);
 
             // TODO: MODULE_FILTERS
             // 1. Invoke saveFiltersToLocalStorage here
@@ -204,7 +205,7 @@
 
         //helper function
         function onlyUnique(value, index, self) {
-            return self.indexOf(value) === index;
+        return self.indexOf(value) === index;
         }
 
         //registering module based functions in the DOM in order for them to work

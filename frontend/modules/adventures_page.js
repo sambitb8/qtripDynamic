@@ -1,4 +1,3 @@
-import { json } from "stream/consumers";
 import config from "../conf/index.js";
 
 //Implementation to extract city from query params
