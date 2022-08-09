@@ -4,8 +4,8 @@ import config from "../conf/index.js";
 function getAdventureIdFromURL(search) {
   // TODO: MODULE_ADVENTURE_DETAILS
   // 1. Get the Adventure Id from the URL
-let urlParam = new URLSearchParams(search);
-let adventureId = urlParam.get(`adventure`);
+  let urlParam = new URLSearchParams(search);
+  let adventureId = urlParam.get(`adventure`);
   // Place holder for functionality to work in the Stubs
 
   return adventureId;
@@ -16,10 +16,12 @@ async function fetchAdventureDetails(adventureId) {
   // 1. Fetch the details of the adventure by making an API call
   // http://43.205.151.44:8082/adventures/detail?adventure=0301948003
   try {
-    let res = await fetch(`${config.backendEndpoint}/adventures/detail?adventure=${adventureId}`);
+    let res = await fetch(
+      `${config.backendEndpoint}/adventures/detail?adventure=${adventureId}`
+    );
     let adventureDetails = await res.json();
     return adventureDetails;
-  } catch(err) {
+  } catch (err) {
     return null;
   }
 
@@ -30,22 +32,24 @@ async function fetchAdventureDetails(adventureId) {
 function addAdventureDetailsToDOM(adventure) {
   // TODO: MODULE_ADVENTURE_DETAILS
   // 1. Add the details of the adventure to the HTML DOM
- document.getElementById(`adventure-name`).innerHTML = adventure.name;
- document.getElementById(`adventure-subtitle`).innerHTML = adventure.subtitle;
- adventure.images.map(img => {
-  let image = document.createElement(`img`);
-  image.setAttribute(`src`, img);
-  image.className = `activity-card-image`;
-  document.getElementById(`photo-gallery`).appendChild(image);
- })
- document.getElementById(`adventure-content`).innerHTML = adventure.content;
+  document.getElementById(`adventure-name`).innerHTML = adventure.name;
+  document.getElementById(`adventure-subtitle`).innerHTML = adventure.subtitle;
+  adventure.images.map((img) => {
+    let image = document.createElement(`img`);
+    image.setAttribute(`src`, img);
+    image.className = `activity-card-image`;
+    document.getElementById(`photo-gallery`).appendChild(image);
+  });
+  document.getElementById(`adventure-content`).innerHTML = adventure.content;
 }
 
 //Implementation of bootstrap gallery component
 function addBootstrapPhotoGallery(images) {
   // TODO: MODULE_ADVENTURE_DETAILS
   // 1. Add the bootstrap carousel to show the Adventure images
-  document.getElementById(`photo-gallery`).innerHTML = `<div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+  document.getElementById(
+    `photo-gallery`
+  ).innerHTML = `<div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
   <div class="carousel-indicators">
     <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
     <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
@@ -62,46 +66,106 @@ function addBootstrapPhotoGallery(images) {
   </button>
 </div>`;
 
-images.map((img, index) => {
-  let div = document.createElement(`div`);
-  if(index === 0) {
-    div.className = `carousel-item active`;
-  } else {
-    div.className = `carousel-item`;
-  }
+  images.map((img, index) => {
+    let div = document.createElement(`div`);
+    if (index === 0) {
+      div.className = `carousel-item active`;
+    } else {
+      div.className = `carousel-item`;
+    }
 
-  div.innerHTML = `<img src="${img}" class="d-block activity-card-image w-100" alt="">`
+    div.innerHTML = `<img src="${img}" class="d-block activity-card-image w-100" alt="">`;
 
-  document.getElementById(`carousel-inner`).appendChild(div);
-})
+    document.getElementById(`carousel-inner`).appendChild(div);
+  });
 }
 
 //Implementation of conditional rendering of DOM based on availability
 function conditionalRenderingOfReservationPanel(adventure) {
   // TODO: MODULE_RESERVATIONS
   // 1. If the adventure is already reserved, display the sold-out message.
-
+  if (adventure.available === true) {
+    document.getElementById(
+      `reservation-panel-available`
+    ).style.display = `block`;
+    document.getElementById(
+      `reservation-panel-sold-out`
+    ).style.display = `none`;
+    document.getElementById(`reservation-person-cost`).innerHTML =
+      adventure.costPerHead;
+  } else {
+    document.getElementById(
+      `reservation-panel-available`
+    ).style.display = `none`;
+    document.getElementById(
+      `reservation-panel-sold-out`
+    ).style.display = `block`;
+  }
 }
 
 //Implementation of reservation cost calculation based on persons
 function calculateReservationCostAndUpdateDOM(adventure, persons) {
   // TODO: MODULE_RESERVATIONS
   // 1. Calculate the cost based on number of persons and update the reservation-cost field
-
+  document.getElementById("reservation-cost").innerHTML =
+    adventure.costPerHead * persons;
 }
-
 //Implementation of reservation form submission
 function captureFormSubmit(adventure) {
   // TODO: MODULE_RESERVATIONS
   // 1. Capture the query details and make a POST API call using fetch() to make the reservation
   // 2. If the reservation is successful, show an alert with "Success!" and refresh the page. If the reservation fails, just show an alert with "Failed!".
+  let adventureId = adventure.id;
+  async function handleFormSubmit(e) {
+    e.preventDefault();
+    const url = `${config.backendEndpoint}/reservations/new`;
+    let form = new FormData(e.target);
+    let name = form.get("name");
+    let date = form.get("date");
+    let person = form.get("person");
+
+    let obj = { name: name, date: date, person: person, adventure: adventureId };
+
+    try {
+      let res = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(obj),
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+      });
+  
+      let FormData = await res.json();
+     
+      if(res.ok) {
+        alert(`Success!`);
+        location.reload();
+      } else {
+        alert(`Failed!`);
+      }
+
+      return FormData;
+      
+    } catch(err) {
+      console.log(err);
+    }
+
+  }
+
+  let form = document.getElementById("myForm");
+  form.addEventListener(`submit`, handleFormSubmit);
 }
 
 //Implementation of success banner after reservation
 function showBannerIfAlreadyReserved(adventure) {
   // TODO: MODULE_RESERVATIONS
   // 1. If user has already reserved this adventure, show the reserved-banner, else don't
-
+  if(adventure.reserved) {
+    document.getElementById(`reserved-banner`).style.display = `block`;
+  } else {
+    document.getElementById(`reserved-banner`).style.display = `none`;
+  }
 }
 
 export {
