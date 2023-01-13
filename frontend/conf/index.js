@@ -1,4 +1,4 @@
 
-const config = { backendEndpoint: "https://qtrip-dynamic-sambitb8.herokuapp.com" };
+const config = { backendEndpoint: "https://qtrip-dynamic-frontend-sambitb8.onrender.com" };
 
 export default config 
